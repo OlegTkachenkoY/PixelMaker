@@ -1,14 +1,12 @@
 from datetime import datetime, date, time
 from tkinter import *
 from os import path
-from PIL import Image, ImageDraw
+from PIL import Image, ImageDraw,  ImageTk
+import Filters as Fil
 
 class Applying(object):
-    apply_window = Tk()
-    apply_window.title("Select a filter for each photo.")
-    apply_window.geometry('800x600')  # '800x600'
 
-    #def negativ_BtnAction():
+    # def negativ_BtnAction():
 
     def save(self, image, filter_name):
         full_name = path.basename(self.getImage_path())
@@ -56,10 +54,32 @@ class Applying(object):
     pix = image.load()
 
 
+class ApplyingObjects(object):
+    def __init__(self, master):
+        master.title("Select a filter for each photo.")
+        master.geometry('1000x1000')  # '800x600'
+
+        path_image = "Resources/Temp/negative.jpg"
+        image = Image.open(path_image)
+        photo = ImageTk.PhotoImage(image)
+
+
+        original_photo = Label(image=photo)
+        original_photo.image = photo
+        original_photo.grid(column=0, row=0)
+
+        # self.listbox = Listbox(master)
+        # self.listbox.grid(column=0, row=0, rowspan=3, sticky=W + E + N + S, ipadx=50, ipady=20)
+
+
+apply_window = Tk()
+AppObj = ApplyingObjects(apply_window)
+
+apply_window.mainloop()
 
 # Negative.
-btn_neg = Button(apply_window, text="Custom", command=custom(image, draw, pix))
-btn_neg.grid(column=1, row=0, sticky=W + E + N + S)
+# btn_neg = Button(apply_window, text="Custom", command=)
+# btn_neg.grid(column=1, row=0, sticky=W + E + N + S)
 # Grayscale.
 # btn_gray = Button(apply_window, text="Add a file", command=gray)
 # btn_gray.grid(column=1, row=0, sticky=W + E + N + S)
@@ -78,5 +98,3 @@ btn_neg.grid(column=1, row=0, sticky=W + E + N + S)
 # # Adding noise.
 # btn_noise = Button(apply_window, text="Add a file", command=add_file)
 # btn_noise.grid(column=1, row=0, sticky=W + E + N + S)
-
-apply_window.mainloop()

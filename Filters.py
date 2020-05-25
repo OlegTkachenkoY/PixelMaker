@@ -1,5 +1,6 @@
 import random
 
+
 class Filtters(object):
     def negative(self, image, draw, pix):
         for i in range(image.size[0]):
@@ -158,4 +159,3 @@ class Filtters(object):
                 if b > 255: b = 255
 
                 draw.point((i, j), (r, g, b))
-
