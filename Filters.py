@@ -1,161 +1,191 @@
 import random
+from datetime import datetime
 
 
-class Filtters(object):
-    def negative(self, image, draw, pix):
-        for i in range(image.size[0]):
-            for j in range(image.size[1]):
-                r, g, b = pix[i, j]
+def save(image, name_filter, file_extension='jpg'):
+    time_save = datetime.today().timetuple()
 
-                draw.point((i, j), (255 - r, 255 - g, 255 - b))
+    try:
+        output_image_path = "Resources/{}{}{}_{}{}{}{}({}).{}".format(
+            time_save[0],
+            time_save[1],
+            time_save[2],
+            time_save[3],
+            time_save[4],
+            time_save[5],
+            time_save[6],
+            name_filter,
+            file_extension)
+        image.save(output_image_path)
+    except:
+        print("Error, file cannot be saved.")
+    else:
+        print("Saved successfully.")
+        return output_image_path
 
-    def gray(self, image, draw, pix):
-        for i in range(image.size[0]):
-            for j in range(image.size[1]):
-                r, g, b = pix[i, j]
 
-                avg = (r + g + b) // 3
+def negative(image, draw, pix, file_extension='jpg'):
+    for i in range(image.size[0]):
+        for j in range(image.size[1]):
+            r, g, b = pix[i, j]
+            draw.point((i, j), (255 - r, 255 - g, 255 - b))
+    del draw
+    return save(image, 'negative', file_extension)
 
-                draw.point((i, j), (avg, avg, avg))
 
-    # 0 < and >100 ??
-    def sepia(self, image, draw, pix):
-        depth = int(input('depth:'))
+def gray(image, draw, pix, file_extension='jpg'):
+    for i in range(image.size[0]):
+        for j in range(image.size[1]):
+            r, g, b = pix[i, j]
 
-        for i in range(image.size[0]):
-            for j in range(image.size[1]):
+            avg = (r + g + b) // 3
 
-                r, g, b = pix[i, j]
+            draw.point((i, j), (avg, avg, avg))
+    del draw
+    return save(image, 'gray', file_extension)
 
-                avg = (r + g + b) // 3
 
-                r = avg + depth * 2
-                g = avg + depth
-                b = avg
+# 0 < and >100 ??
+def sepia(image, draw, pix, depth, file_extension='jpg'):
+    # depth = int(input('depth:'))
 
-                if r > 255: r = 255
-                if g > 255: g = 255
-                if b > 255: b = 255
+    for i in range(image.size[0]):
+        for j in range(image.size[1]):
 
-                draw.point((i, j), (r, g, b))
-        # image.save("Resources/ans.jpg", "JPEG")
-        # del draw
+            r, g, b = pix[i, j]
 
-    # < 0 and > 100
-    def bright(self, image, draw, pix):
-        factor = int(input('factor:'))
+            avg = (r + g + b) // 3
 
-        for i in range(image.size[0]):
-            for j in range(image.size[1]):
-                r = factor + pix[i, j][0]
-                g = factor + pix[i, j][1]
-                b = factor + pix[i, j][2]
+            r = avg + depth * 2
+            g = avg + depth
+            b = avg
 
-                if r < 0: r = 0
-                if g < 0: g = 0
-                if b < 0: b = 0
+            if r > 255: r = 255
+            if g > 255: g = 255
+            if b > 255: b = 255
 
-                if r > 255: r = 255
-                if g > 255: g = 255
-                if b > 255: b = 255
+            draw.point((i, j), (r, g, b))
+    del draw
+    return save(image, 'sepia', file_extension)
 
-                draw.point((i, j), (r, g, b))
-        # image.save("Resources/ans.jpg", "JPEG")
-        # del draw
 
-    # < -50 and >50
-    def contrast(self, image, draw, pix):
-        coefficient = int(input("coefficient: ")) / 2
+# < 0 and > 100
+def bright(image, draw, pix, factor, file_extension='jpg'):
+    # factor = int(input('factor:'))
 
-        avg = 0
+    for i in range(image.size[0]):
+        for j in range(image.size[1]):
+            r = factor + pix[i, j][0]
+            g = factor + pix[i, j][1]
+            b = factor + pix[i, j][2]
 
-        for i in range(image.size[0]):
-            for j in range(image.size[1]):
-                r, g, b = pix[i, j]
+            if r < 0: r = 0
+            if g < 0: g = 0
+            if b < 0: b = 0
 
-                avg += (r * 0.299 + g * 0.587 + b * 0.114)
+            if r > 255: r = 255
+            if g > 255: g = 255
+            if b > 255: b = 255
 
-        avg /= image.size[0] * image.size[1]
+            draw.point((i, j), (r, g, b))
+    del draw
+    return save(image, 'bright', file_extension)
 
-        palette = []
-        for i in range(256):
 
-            temp = int(avg + coefficient * (i - avg))
+# < -50 and >50
+def contrast(image, draw, pix, coefficient, file_extension='jpg'):
+    # coefficient = int(input("coefficient: ")) / 2
 
-            if temp < 0: temp = 0
-            if temp > 255: temp = 255
+    avg = 0
 
-            palette.append(temp)
+    for i in range(image.size[0]):
+        for j in range(image.size[1]):
+            r, g, b = pix[i, j]
 
-        for i in range(image.size[0]):
-            for j in range(image.size[1]):
-                r, g, b = pix[i, j]
+            avg += (r * 0.299 + g * 0.587 + b * 0.114)
 
-                draw.point((i, j), (palette[r], palette[g], palette[b]))
+    avg /= image.size[0] * image.size[1]
 
-        # image.save("Resources/ans.jpg", "JPEG")
-        # del draw
+    palette = []
+    for i in range(256):
 
-    # < -150 and >150
-    def black_white(self, image, draw, pix):
-        factor = int(input('factor:'))
+        temp = int(avg + coefficient * (i - avg))
 
-        for i in range(image.size[0]):
-            for j in range(image.size[1]):
-                r, g, b = pix[i, j]
+        if temp < 0: temp = 0
+        if temp > 255: temp = 255
 
-                avg = r + g + b
+        palette.append(temp)
 
-                if avg > (((255 + factor) // 2) * 3):
-                    r, g, b = 255, 255, 255
-                else:
-                    r, g, b = 0, 0, 0
-                draw.point((i, j), (r, g, b))
-        # image.save("Resources/ans.jpg", "JPEG")
-        # del draw
+    for i in range(image.size[0]):
+        for j in range(image.size[1]):
+            r, g, b = pix[i, j]
 
-    # < 0 and > 1000
-    def noise(self, image, draw, pix):
-        factor = int(input('factor:'))
+            draw.point((i, j), (palette[r], palette[g], palette[b]))
 
-        for i in range(image.size[0]):
-            for j in range(image.size[1]):
+    del draw
+    return save(image, 'contrast', file_extension)
 
-                rand = random.randint(-factor, factor)
 
-                r = pix[i, j][0] + rand
-                g = pix[i, j][1] + rand
-                b = pix[i, j][2] + rand
+# < -150 and >150
+def black_white(image, draw, pix, factor, file_extension='jpg'):
+    # factor = int(input('factor:'))
 
-                if r < 0: r = 0
-                if g < 0: g = 0
-                if b < 0: b = 0
+    for i in range(image.size[0]):
+        for j in range(image.size[1]):
+            r, g, b = pix[i, j]
 
-                if r > 255: r = 255
-                if g > 255: g = 255
-                if b > 255: b = 255
-                draw.point((i, j), (r, g, b))
-        # image.save("Resources/ans.jpg", "JPEG")
-        # del draw
+            avg = r + g + b
 
-    def custom(self, image, draw, pix):
-        depth = int(input('depth:'))
+            if avg > (((255 + factor) // 2) * 3):
+                r, g, b = 255, 255, 255
+            else:
+                r, g, b = 0, 0, 0
+            draw.point((i, j), (r, g, b))
+    del draw
+    return save(image, 'black_white',file_extension)
 
-        r1 = int(input("R: "))
-        g1 = int(input("G: "))
-        b1 = int(input("B: "))
 
-        for i in range(image.size[0]):
-            for j in range(image.size[1]):
+# < 0 and > 1000
+def noise(image, draw, pix, factor, file_extension='jpg'):
+    # factor = int(input('factor:'))
 
-                r, g, b = pix[i, j]
+    for i in range(image.size[0]):
+        for j in range(image.size[1]):
 
-                r += r1 + depth
-                g += g1 + depth
-                b += b1 + depth
+            rand = random.randint(-factor, factor)
 
-                if r > 255: r = 255
-                if g > 255: g = 255
-                if b > 255: b = 255
+            r = pix[i, j][0] + rand
+            g = pix[i, j][1] + rand
+            b = pix[i, j][2] + rand
 
-                draw.point((i, j), (r, g, b))
+            if r < 0: r = 0
+            if g < 0: g = 0
+            if b < 0: b = 0
+
+            if r > 255: r = 255
+            if g > 255: g = 255
+            if b > 255: b = 255
+            draw.point((i, j), (r, g, b))
+    del draw
+    return save(image, 'noise', file_extension)
+
+
+def custom(image, draw, pix, depth, r_custom, g_custom, b_custom, file_extension='jpg'):
+
+    for i in range(image.size[0]):
+        for j in range(image.size[1]):
+
+            r, g, b = pix[i, j]
+
+            r += r_custom + depth
+            g += g_custom + depth
+            b += b_custom + depth
+
+            if r > 255: r = 255
+            if g > 255: g = 255
+            if b > 255: b = 255
+
+            draw.point((i, j), (r, g, b))
+    del draw
+    return save(image, 'custom', file_extension)
+
