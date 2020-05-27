@@ -8,45 +8,74 @@ import Filters as F
 
 class MainClass:
     def __init__(self, master):
+        """
+        Objects for the interface are created in the designer, and also variables are declared.
+        To instantiate a class, you must pass the main window to the class
+        """
 
+        # The passed variable is assigned to the created variable in the class
         self.master = master
 
+        # Project title.The size of the main window
         self.master.title("PixelMaker")
-        self.master.geometry('1200x400')  # '800x600'
+        self.master.geometry('1200x400')
 
-        self.path_image = self.resize_image(input_image_path="Examples/3.jpg", size=(280, 280))
+        # The path to the example is passed to the function where the photo is compressed
+        self.path_image = self.resize_image(
+            input_image_path="Examples/3.jpg",  #The path to the example
+            size=(280, 280))                    #size
+
+        #Opening and saving a photo as a variable
         image = Image.open(self.path_image)
         photo = ImageTk.PhotoImage(image)
 
-        self.frame = Frame(self.master, bd=5)
-        self.frame.grid(column=0, row=9, columnspan=6, sticky=W + E + N + S)
+        #Creating a container for widgets
+        self.frame = Frame(self.master)
 
+        #A list is created in which we will add the path to the file, and place it in the window with grid
         self.listbox = Listbox(self.master)
         self.listbox.grid(column=0, row=0, rowspan=7, sticky=W + E + N + S, ipadx=50, ipady=40)
 
+        #Creating a variable to transmit information to the user, set the start data
         self.str_info = StringVar()
         self.str_info.set('Hello, this is info label. I help you.\n At start chose you photo. (Add a file)')
+
+        #Creating a window to information, set position in Frame
         self.label_info = Label(self.master,
                                 textvariable=self.str_info,
                                 bg='green')
         self.label_info.grid(column=0, row=7, sticky=W + E + N + S)
 
+        #Creating a canvas for an example of the original photo,
+        # Inserting the photo into the canvas,
+        # placing in a frame.
         self.original_photo = Canvas(self.master, height=280, width=280)
         self.original_photo.image = photo  # <--- keep reference of your image
         self.original_photo.create_image(0, 0, anchor='nw', image=photo)
         self.original_photo.grid(column=2, row=0, rowspan=9)
 
+        # Creating a canvas for an example of the editable photo,
+        # Inserting the photo into the canvas,
+        # placing in a frame.
         self.edit_photo = Canvas(self.master, height=280, width=280)
         self.edit_photo.image = photo  # <--- keep reference of your image
         self.edit_photo.create_image(0, 0, anchor='nw', image=photo)
         self.edit_photo.grid(column=4, row=0, rowspan=9)
 
+        #Variable for radiobuttons, it is needed to read which button is pressed
         self.var = IntVar()
-        self.extension = 'jpg'
 
-        self.rbutton1 = Radiobutton(self.master, text='Negative', variable=self.var, indicatoron=0, value=1,
-                                    command=self.negativ_grayAction)
-        self.rbutton1.grid(column=3, row=0, sticky=W + E + N + S)
+        #Creation of 8 buttons for filters, all buttons are almost identical,
+        #only the location in the main window changes, and the command.
+        #(Therefore, I will describe only one button)
+        self.rbutton1 = Radiobutton(self.master,                    #Button location
+                                    text='Negative',                #Button name
+                                    variable=self.var,              #variable that changes when pressed
+                                    indicatoron=0,                  #Button view
+                                    value=1,                        #the value assigned to the variable
+                                    command=self.negativ_grayAction)#The command used when pressing
+        self.rbutton1.grid(column=3, row=0,         #Button location
+                           sticky=W + E + N + S)    #Stretching the button on all sides
 
         self.rbutton2 = Radiobutton(self.master, text='Gray', variable=self.var, indicatoron=0, value=2,
                                     command=self.negativ_grayAction)
@@ -76,20 +105,35 @@ class MainClass:
                                     command=self.customAction)
         self.rbutton8.grid(column=3, row=7, sticky=W + E + N + S)
 
-        btn_add = Button(self.master, text="Add a file", command=self.add_file)
-        btn_add.grid(column=1, row=0, rowspan=4, sticky=W + E + N + S)
-
+        #The main buttons for actions in the program.
+        #Add - adds a file
+        #Delete - deletes the selected file
+        #Try - make a small copy of the photo and try the filters
+        #Save - saves the photo
+        #(the buttons are almost the same so I will describe only one)
+        btn_add = Button(self.master,                   #Button location
+                         text="Add a file",             #Button name
+                         command=self.add_file)         #The command used when pressing
+        btn_add.grid(column=1, row=0,                   #Button location
+                     rowspan=4,                         #Stretch the button in several rows
+                     sticky=W + E + N + S)              #Stretching the button on all sides
         btn_del = Button(self.master, text="Delete the file", command=self.del_file)
         btn_del.grid(column=1, row=4, rowspan=4, sticky=W + E + N + S)
-
         btn_try = Button(self.master, text="Look at the photo", command=self.try_file)
         btn_try.grid(column=5, row=0, rowspan=4, sticky=W + E + N + S)
-
         btn_save = Button(self.master, text="Save", command=self.save_photo)
         btn_save.grid(column=5, row=4, rowspan=4, sticky=W + E + N + S)
 
-        btn_jpeg = Button(self.master, text=".jpeg", command=self.jpegAction)
-        btn_jpeg.grid(column=6, row=4, sticky=W + E + N + S)
+        #Default photo format
+        self.extension = 'jpg'
+
+        #Buttons for selecting the file format (default .jpg)
+        # (the buttons are almost the same so I will describe only one)
+        btn_jpeg = Button(self.master,                  #Button location
+                          text=".jpeg",                 #Button name
+                          command=self.jpegAction)      #The command used when pressing
+        btn_jpeg.grid(column=6, row=4,                  #Button location
+                      sticky=W + E + N + S)             #Stretching the button on all sides
         btn_jpg = Button(self.master, text=".jpg", command=self.jpgAction)
         btn_jpg.grid(column=6, row=5, sticky=W + E + N + S)
         btn_bmp = Button(self.master, text=".bmp", command=self.bmpAction)
@@ -98,45 +142,75 @@ class MainClass:
         btn_png.grid(column=6, row=7, sticky=W + E + N + S)
 
     def jpegAction(self):
-        self.extension = 'jpeg'
-        self.str_info.set('Your photo will be saved in .jpeg format')
+        """
+        Called when the button is pressed jpeg changes the variable extension to jpeg
+        """
+        self.extension = 'jpeg'                                         #data change
+        self.str_info.set('Your photo will be saved in .jpeg format')   #ichange info in Label
 
     def jpgAction(self):
-        self.extension = 'jpg'
-        self.str_info.set('Your photo will be saved in .jpg format')
+        """
+        Called when the button is pressed jpg changes the variable extension to jpg
+        """
+        self.extension = 'jpg'                                          #data change
+        self.str_info.set('Your photo will be saved in .jpg format')    #ichange info in Label
 
     def bmpAction(self):
-        self.extension = 'bmp'
-        self.str_info.set('Your photo will be saved in .bmp format')
+        """
+        Called when the button is pressed bmp changes the variable extension to bmp
+        """
+        self.extension = 'bmp'                                          #data change
+        self.str_info.set('Your photo will be saved in .bmp format')    #ichange info in Label
 
     def pngAction(self):
-        self.extension = 'png'
-        self.str_info.set('Your photo will be saved in .png format')
+        """
+        Called when the button is pressed png changes the variable extension to png
+        """
+        self.extension = 'png'                                          #data change
+        self.str_info.set('Your photo will be saved in .png format')    #ichange info in Label
+
 
     def negativ_grayAction(self):
-        self.frame.destroy()
+        """
+        Starts when the Negativ button is pressed. Makes a change in the Frame container
+        """
+        self.frame.destroy()        #Del frame
 
     def sepiaAction(self):
-        self.frame.destroy()
+        """
+        Starts when the Sepia button is pressed. Makes a change in the Frame container
+        """
+        self.frame.destroy()  # Del frame
 
-        self.frame = Frame(self.master, bg='green', bd=5)
-        self.frame.grid(column=0, row=9, columnspan=6)
+        #Basically all filter buttons are the same so I write only one function for example
+        self.frame = Frame(self.master,         #Location
+                           bg='green',          #background
+                           bd=5)                #borderwidth
+        self.frame.grid(column=0, row=9,        #Coordinates in the grid
+                        columnspan=7)           #expanded to 7 columns
 
+        #Ordinary captions are created, without the word self,
+        # because in the future they do not need to be edited,
+        # they exist only in the function
         label1 = Label(self.frame, text='new')
         label1.grid(column=0, row=0, sticky=W + E + N + S)
         label2 = Label(self.frame, text='60s')
         label2.grid(column=2, row=0, sticky=W + E + N + S)
 
-        self.scale = Scale(self.frame,
-                           orient=HORIZONTAL,
+        #scale to select concentration, filter (Also to select contrast)
+        self.scale = Scale(self.frame,          #Location(Not in Master!!!)
+                           orient=HORIZONTAL,   #Horizontally located
                            length=500,
                            from_=0, to=100,
-                           tickinterval=10,
+                           tickinterval=10,     #The interval between numbers
                            resolution=5)
         self.scale.grid(column=1, row=0)
 
     def brightAction(self):
-        self.frame.destroy()
+        """
+        Starts when the bright button is pressed. Makes a change in the Frame container
+        """
+        self.frame.destroy()  # Del frame
 
         self.frame = Frame(self.master, bg='green', bd=5)
         self.frame.grid(column=0, row=9, columnspan=6)
@@ -155,7 +229,10 @@ class MainClass:
         self.scale.grid(column=1, row=0)
 
     def contrastAction(self):
-        self.frame.destroy()
+        """
+        Starts when the contrast button is pressed. Makes a change in the Frame container
+        """
+        self.frame.destroy()  # Del frame
 
         self.frame = Frame(self.master, bg='green', bd=5)
         self.frame.grid(column=0, row=9, columnspan=6)
@@ -174,7 +251,10 @@ class MainClass:
         self.scale.grid(column=1, row=0)
 
     def black_and_whiteAction(self):
-        self.frame.destroy()
+        """
+        Starts when the Black and White button is pressed. Makes a change in the Frame container
+        """
+        self.frame.destroy()  # Del frame
 
         self.frame = Frame(self.master, bg='green', bd=5)
         self.frame.grid(column=0, row=9, columnspan=6)
@@ -193,7 +273,10 @@ class MainClass:
         self.scale.grid(column=1, row=0)
 
     def noiseAction(self):
-        self.frame.destroy()
+        """
+        Starts when the noise button is pressed. Makes a change in the Frame container
+        """
+        self.frame.destroy()  # Del frame
 
         self.frame = Frame(self.master, bg='green', bd=5)
         self.frame.grid(column=0, row=9, columnspan=6)
@@ -212,7 +295,10 @@ class MainClass:
         self.scale.grid(column=1, row=0)
 
     def customAction(self):
-        self.frame.destroy()
+        """
+        Starts when the custom button is pressed. Makes a change in the Frame container
+        """
+        self.frame.destroy()  # Del frame
 
         self.frame = Frame(self.master, bg='green', bd=5)
         self.frame.grid(column=0, row=9, columnspan=6)
@@ -237,6 +323,7 @@ class MainClass:
         label5 = Label(self.frame, text='B')
         label5.grid(column=4, row=1, sticky=W + E + N + S)
 
+        #Created regular fields for entering colors in the format RGB
         self.entry_r = Entry(self.frame)
         self.entry_r.grid(column=1, row=1, sticky=W + E + N + S)
         self.entry_g = Entry(self.frame)
@@ -244,9 +331,16 @@ class MainClass:
         self.entry_b = Entry(self.frame)
         self.entry_b.grid(column=5, row=1, sticky=W + E + N + S)
 
+
     def add_file(self):
-        text = filedialog.askopenfilename(initialdir="/", title="Select file",
-                                          filetypes=(("jpeg files", "*.jpg"),
+        """
+        The function allows you to select a file, it is fixed with the element filedialog.askopenfilename.
+        The result is recorded in listbox
+        """
+
+        text = filedialog.askopenfilename(initialdir="/",                       #Starting position
+                                          title="Select file",                  #Name
+                                          filetypes=(("jpeg files", "*.jpg"),   #File formats
                                                      ("bmp files", "*.bmp"),
                                                      ("png files", "*.png")
                                                      # ("all files", "*.*")
@@ -254,43 +348,73 @@ class MainClass:
         self.listbox.insert(END, text)
 
     def del_file(self):
-        select = list(self.listbox.curselection())
-        select.reverse()
+        """
+        The function is activated by pressing the Del button,
+        after which the selected file is deleted.
+        """
+        select = list(self.listbox.curselection())      #the selected file is written to the variable, if any
+
+        #The loop is needed to delete a number of selected files.
         for i in select:
-            self.listbox.delete(i)
+            self.listbox.delete(i)                      #Del
 
     def try_file(self):
-
+        """
+        This feature creates a small copy of the selected photo and uses the selected filter on it.
+        The procedure for applying the filter is quite complicated,
+        so in order for the user to be able to view their photo, I decided to do this feature.
+        Its main goal is to reduce the waiting time for the user.
+        As a result, the photo and the edited photo are saved in the canvas for viewing.
+        """
+        #The first block checks for an error, it occurs if the user does not select a file
         try:
             select = self.listbox.get(0, self.listbox.curselection())
-        except:
-            self.str_info.set('Select a picture, please.')
+        except:     #_tkinter.TclError
+            # select = 'Examples/3.jpg'
+            self.str_info.set('Select a picture, please.') #If an error occurs, the user immediately sees it
         else:
-            select = self.resize_image(input_image_path=select[0], size=(280, 280))
+            #Filter value
             value = self.var.get()
+            # transfer a photo to compress it
+            select = self.resize_image(input_image_path=select[0], size=(280, 280))
+            # Writes a photo to the object
             image = Image.open(select)
+
+            #Checks if the file can be opened
             try:
+
+                #Writes the object as a picture
                 draw = ImageDraw.Draw(image)
+                #open the object
                 photo_original = ImageTk.PhotoImage(image)
-            except:
-                self.str_info.set('Error, file a not work')
+            except: #PIL.UnidentifiedImageError
+                self.str_info.set('Error, file a not work') #If an error occurs, the user immediately sees it
             else:
-                self.original_photo.image = photo_original  # <--- keep reference of your image
+                #Fills a photo without a filter in the left canvas
+                self.original_photo.image = photo_original  # <--- keep reference of image
                 self.original_photo.create_image(0, 0, anchor='nw', image=photo_original)
+                #Loads pixels
                 pix = image.load()
 
                 if value == 0:
+                    #If the user does not select a filter, he will know about it immediately
                     self.str_info.set('Please chose a filter')
                 elif value == 1:
+                    #The following blocks are about the same so I will describe only this one
+                    #sends the compressed photo to the filter and returns the path of the new one
                     path_file = F.negative(image=image, draw=draw, pix=pix)
-                    del draw
 
+                    del draw    #del draw
+
+                    #Opens a photo and writes to a variable
                     image = Image.open(path_file)
                     photo_edit = ImageTk.PhotoImage(image)
 
+                    #Replaces the photo on the left canvas
                     self.edit_photo.image = photo_edit  # <--- keep reference of your image
                     self.edit_photo.create_image(0, 0, anchor='nw', image=photo_edit)
 
+                    #Deletes the created file
                     remove(path_file)
 
                 elif value == 2:
@@ -391,7 +515,7 @@ class MainClass:
                 remove(select)
 
     def save_photo(self):
-
+        """Function for saving photos, input: Path, idi filter. As a result, saves the photo"""
         try:
             select = self.listbox.get(0, self.listbox.curselection())
         except:
@@ -458,8 +582,24 @@ class MainClass:
         finally:
             self.str_info.set('Your photo is saved in a folder /Resources')
 
+
     def resize_image(self, input_image_path, size):
+        """
+        resizes the photo, unfortunately in some cases it compresses the photo incorrectly
+        (when the photo does not look like a square, and the entered sizes are as for a square)
+        Ideally, you still need to create a mechanism that assigns the ratio of the parties and reduces them,
+        but unfortunately I have not figured out how to do it
+        input:
+            way photo
+            size
+        output:
+            compressed photo path
+        """
+
+        #saves file compression time
         time_save = datetime.today().timetuple()
+
+        #Creates a new way to save a photo
         output_image_path = "Resources/Temp/_{}{}{}_{}{}{}{}.jpg".format(
             time_save[0],
             time_save[1],
@@ -469,16 +609,24 @@ class MainClass:
             time_save[5],
             time_save[6])
 
+        #Opens a photo
         original_image = Image.open(input_image_path)
 
+        #Compressed
         resized_image = original_image.resize(size)
 
+        #Saves
         resized_image.save(output_image_path)
+        #returns the path of the edited photo
+
         return output_image_path
 
     def __del__(self):
+        """Deletes objects after class execution"""
+        #Deletes the sample photo
         remove(self.path_image)
 
+#######START########
 
 apply_window = Tk()
 
